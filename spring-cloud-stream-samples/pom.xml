@@ -16,6 +16,7 @@
 	</parent>
 	<modules>
 		<module>source</module>
+		<module>source-http</module>
 		<module>sink</module>
 		<module>transform</module>
 		<module>tap</module>
