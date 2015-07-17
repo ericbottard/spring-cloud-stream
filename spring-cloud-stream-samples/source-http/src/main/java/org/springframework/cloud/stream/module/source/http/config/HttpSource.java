@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.annotation.EnableModule;
 import org.springframework.cloud.stream.annotation.Output;
+import org.springframework.cloud.stream.annotation.Source;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.InboundChannelAdapter;
 import org.springframework.integration.annotation.Poller;
@@ -35,20 +36,20 @@ import org.springframework.messaging.MessageChannel;
  *
  * @author Eric Bottard
  */
-@EnableModule
+@EnableModule(Source.class)
 @EnableConfigurationProperties(HttpSourceOptions.class)
 public class HttpSource {
 
 	@Autowired
 	private HttpSourceOptions options;
 
-	@Output
-	public MessageChannel output;
+	@Autowired
+	private Source source;
 
-	@Bean
+	//@Bean
 	public HttpRequestHandlingController gateway() {
 		HttpRequestHandlingController httpRequestHandlingMessagingGateway = new HttpRequestHandlingController(false);
-		httpRequestHandlingMessagingGateway.setRequestChannel(output);
+		httpRequestHandlingMessagingGateway.setRequestChannel(source.output());
 		httpRequestHandlingMessagingGateway.setBeanName("/foo");
 		return httpRequestHandlingMessagingGateway;
 	}
