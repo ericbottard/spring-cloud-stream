@@ -18,8 +18,16 @@ package sink;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.annotation.EnableModule;
 import org.springframework.cloud.stream.annotation.Sink;
+import org.springframework.cloud.stream.dynamicoptions.DynamicOptions;
+import org.springframework.cloud.stream.dynamicoptions.Foo;
+import org.springframework.cloud.stream.dynamicoptions.MyConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.integration.annotation.ServiceActivator;
 
 /**
@@ -27,13 +35,26 @@ import org.springframework.integration.annotation.ServiceActivator;
  *
  */
 @EnableModule(Sink.class)
+@Configuration
+@Import(MyConfiguration.class)
+@EnableConfigurationProperties
 public class LogSink {
+
+	@Autowired
+	private Foo foo;
+
+	@Bean
+	@DynamicOptions
+	public Foo foo() {
+		return new Foo();
+	}
 
 	private static Logger logger = LoggerFactory.getLogger(LogSink.class);
 
 	@ServiceActivator(inputChannel=Sink.INPUT)
 	public void loggerSink(Object payload) {
-		logger.info("Received: " + payload);
+        System.out.println(foo.getClass());
+        logger.info("Received: " + foo.getBar() + " "  + payload);
 	}
 
 }
