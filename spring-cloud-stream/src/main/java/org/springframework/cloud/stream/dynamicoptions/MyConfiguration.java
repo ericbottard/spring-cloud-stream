@@ -28,9 +28,4 @@ public class MyConfiguration {
         return scope.channelInterceptor();
     }
 
-    @Bean
-    public GlobalChannelInterceptorInitializer globalChannelInterceptorInitializer() {
-        return new GlobalChannelInterceptorInitializer();
-    }
-
 }

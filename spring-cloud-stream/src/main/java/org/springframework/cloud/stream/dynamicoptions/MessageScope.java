@@ -51,5 +51,10 @@ public class MessageScope implements Scope {
             System.out.println("Receiving " + message + " on " + channel);
             return super.preSend(message, channel);
         }
+
+        @Override
+        public void afterSendCompletion(Message<?> message, MessageChannel channel, boolean sent, Exception ex) {
+            super.afterSendCompletion(message, channel, sent, ex);
+        }
     }
 }
