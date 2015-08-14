@@ -18,8 +18,14 @@ package sink;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.annotation.EnableModule;
+import org.springframework.cloud.stream.annotation.PerMessage;
 import org.springframework.cloud.stream.annotation.Sink;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
 import org.springframework.integration.annotation.ServiceActivator;
 
 /**
@@ -27,13 +33,26 @@ import org.springframework.integration.annotation.ServiceActivator;
  *
  */
 @EnableModule(Sink.class)
+@EnableConfigurationProperties
 public class LogSink {
+
+	@Autowired
+	private LogSinkProperties logSinkProperties;
+
+	@Bean
+	@PerMessage
+	public LogSinkProperties logSinkProperties() {
+		return new LogSinkProperties();
+	}
+
 
 	private static Logger logger = LoggerFactory.getLogger(LogSink.class);
 
 	@ServiceActivator(inputChannel=Sink.INPUT)
 	public void loggerSink(Object payload) {
-		logger.info("Received: " + payload);
+		System.out.println(logSinkProperties);
+		System.out.println(logSinkProperties.getClass());
+		logger.info("Received: " + logSinkProperties.getName() + " " + payload);
 	}
 
 }
