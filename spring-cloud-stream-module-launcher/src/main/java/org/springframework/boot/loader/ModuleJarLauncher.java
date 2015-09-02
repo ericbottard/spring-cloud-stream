@@ -80,12 +80,14 @@ public class ModuleJarLauncher extends ExecutableArchiveLauncher {
 	@Override
 	protected ClassLoader createClassLoader(URL[] urls) throws Exception {
 		ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
-		// try to retrieve the extension classloader
-		ClassLoader extensionClassLoader = systemClassLoader != null ? systemClassLoader.getParent() : null;
-		// set the classloader for the module as the extension classloader if available
-		// fall back to the system classloader (which can also be null) if not available
-		ClassLoader classLoaderForModule = extensionClassLoader != null ? extensionClassLoader : systemClassLoader;
-		return new LaunchedURLClassLoader(urls, classLoaderForModule);
+		// The launcher is typically launched as a boot uber-jar using 'java -jar',
+		// where there is no interesting system ClassLoader contents (can't use -cp with -jar).
+		// We still use the system CL as a parent though, for the case where the uber-jar
+		// is run exploded with additional '-cp' jars, as is the case with e.g. buildpacks on CloudFoundry
+		// Note that the contents of 'launcher-uber.jar!/lib/*.jar' is NOT
+		// in the ClassLoader returned, as we don't want what is needed to the launcher (say Aether)
+		// to be visible to modules themselves.
+		return new ParentConsultingLaunchedURLClassLoader(urls, systemClassLoader);
 	}
 
 }
